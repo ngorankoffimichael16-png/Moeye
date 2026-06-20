@@ -1,0 +1,2169 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MOeye Service </title>
+    <link rel="stylesheet" href="style.css">
+    
+    <script src="javascript.js" defer></script>
+    <script src="rendevous.js" defer></script>
+    <script src="formulaire.js" defer></script>
+</head>
+  <style>
+
+        
+
+@import url('https://googleapis.com');
+
+
+
+:root {
+    --bg-creme: #FBF9F4;         /* 60% : Fond général doux et organique */
+    --text-dark: #111827;        /* Couleur de police principale */
+    --vert-primary: #1B4332;     /* 30% : Identité institutionnelle (Agro/BTP) */
+    --vert-light: #40916C;       /* Teinte secondaire pour transitions et badges */
+    --orange-action: #D97706;    /* 10% : Couleur d'appel à l'action contrastante */
+    --white: #FFFFFF;
+    --radius-smooth: 16px;
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+
+/* ==========================================================================
+   STRUCTURE COMPLÈTE ET RESPONSIVE (ORDINATEUR, TABLETTE, SMARTPHONE)
+   ========================================================================== */
+
+/* 1. CONFIGURATION GÉNÉRALE DU BODY */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Montserrat', sans-serif; /* Application de la nouvelle police */
+    scroll-behavior: smooth;
+}
+
+
+/* ==========================================================================
+   STRUCTURE GLOBALE & CONFIGURATION DU COMPORTEMENT DU BODY
+   ========================================================================== */
+body {
+    background-color: var(--bg-creme);
+    color: var(--text-dark);
+    width: 100%;
+    min-height: 100vh;
+    overflow-x: hidden; 
+    -webkit-overflow-scrolling: touch; /* Défilement fluide garanti sur iOS/iPhone */
+}
+
+/* ==========================================================================
+   BARRE DE NAVIGATION ESCAMOTABLE & ADAPTATIVE (HEADER)
+   ========================================================================== */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 8%; /* Augmentation de l'espace interne pour laisser respirer le menu */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    background-color: rgba(17, 24, 39, 0.4); /* Léger fond sombre au démarrage pour protéger le menu */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+
+/* FOND SOMBRE AU DÉFILEMENT (Sticky effect géré par JS) */
+header.scrolled {
+    background-color: rgba(10, 20, 15, 0.95); 
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px); /* Sécurité pour transparence Safari/iPhone */
+    padding: 15px 8%;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* CLASSE DE MASQUAGE SMART : Propulse le menu en dehors de l'écran vers le haut */
+header.nav-hidden {
+    transform: translateY(-100%) !important;
+}
+
+header .logo a img {
+    height: 50px;
+    border-radius: 10px;
+    width: auto;
+    transition: all 0.3s ease;
+}
+
+header.scrolled .logo a img {
+    height: 42px;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 25px;
+    align-items: center;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-links a {
+    text-decoration: none;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #FFFFFF;
+    transition: all 0.3s ease;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    color: var(--orange-action);
+}
+
+/* ==========================================================================
+   BOUTON MENU HAMBURGER (TROIS TRAITS - MOBILE ONLY)
+   ========================================================================== */
+.menu-toggle {
+    display: none; /* Masqué par défaut sur les ordinateurs */
+    flex-direction: column;
+    justify-content: space-between;
+    width: 28px;
+    height: 20px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: 1100;
+}
+
+.menu-toggle .bar {
+    width: 100%;
+    height: 3px;
+    background-color: #FFFFFF;
+    border-radius: 5px;
+    transition: all 0.3s ease-in-out;
+}
+
+/* ==========================================================================
+   ADAPTATION SMARTPHONE SANS FAILLE (MEDIA QUERIES < 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+    header {
+        padding: 15px 20px !important;
+    }
+    
+    header.scrolled {
+        padding: 15px 20px !important;
+    }
+
+    /* Le bouton hamburger à trois traits devient visible sur mobile */
+    .menu-toggle {
+        display: flex;
+    }
+
+    /* TRANSFORMATION DES NAV-LINKS EN RIDEAU MOBILE TACTILE HAUT DE GAMME */
+    .nav-links {
+        position: fixed;
+        top: -100vh; /* Poussé et masqué en dehors de l'écran vers le haut au départ */
+        left: 0;
+        width: 100%;
+        height: auto;
+        background-color: rgba(10, 20, 15, 0.98); /* Fond rideau très sombre et opaque */
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        flex-direction: column !important; /* Empilement vertical strict des rubriques */
+        align-items: center;
+        justify-content: center;
+        padding: 40px 0;
+        gap: 25px !important;
+        z-index: 1050;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* ÉTAT DÉPLOYÉ : Quand on clique, le volet descend se caler sous la barre */
+    .nav-links.open-menu {
+        top: 72px; /* Ajustement précis de la hauteur sous le logo mobile */
+    }
+
+    .nav-links a {
+        font-size: 1.25rem !important; /* Agrandissement pour un clic facile au pouce */
+        width: 100%;
+        text-align: center;
+        padding: 5px 0;
+    }
+
+    /* ANIMATION INTERACTIVE : Les trois traits pivotent pour former un ✕ rouge/orange */
+    .menu-toggle.toggle-active .bar:nth-child(1) {
+        transform: translateY(8px) rotate(45deg);
+        background-color: var(--orange-action);
+    }
+    .menu-toggle.toggle-active .bar:nth-child(2) {
+        opacity: 0; /* Le trait central s'efface */
+    }
+    .menu-toggle.toggle-active .bar:nth-child(3) {
+        transform: translateY(-9px) rotate(-45deg);
+        background-color: var(--orange-action);
+    }
+}
+
+
+/* ==========================================================================
+   MENU HAMBURGER UNIVERSEL (TROIS TRAITS RESPONSIVE)
+   ========================================================================== */
+
+/* Caché par défaut sur les ordinateurs */
+.menu-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 21px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: 1100;
+}
+
+.menu-toggle .bar {
+    width: 100%;
+    height: 3px;
+    background-color: #FFFFFF; /* Traits blancs pour trancher sur l'image */
+    border-radius: 5px;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Changement de couleur des traits quand le menu devient noir au scroll */
+header.scrolled .menu-toggle .bar {
+    background-color: #FFFFFF;
+}
+
+/* ==========================================================================
+   ADAPTATION DU MENU SUR TOUS LES PETITS TÉLÉPHONES (< 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+    .menu-toggle {
+        display: flex; /* Les trois traits apparaissent sur mobile */
+    }
+
+    /* Le menu se transforme en volet mobile masqué en haut par défaut */
+    .nav-links {
+        position: fixed;
+        top: -100vh; /* Poussé complètement en dehors de l'écran vers le haut */
+        left: 0;
+        width: 100%;
+        height: auto;
+        background-color: rgba(10, 20, 15, 0.98); /* Fond sombre premium */
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        flex-direction: column !important;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 0;
+        gap: 25px !important;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1050;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* ÉTAT ACTIF : Quand on clique, le menu glisse vers le bas et s'affiche */
+    .nav-links.open-menu {
+        top: 80px; /* S'aligne parfaitement juste en dessous de la barre fixe */
+    }
+
+    .nav-links a {
+        font-size: 1.3rem !important; /* Plus grand sur mobile pour faciliter le clic au doigt */
+    }
+
+    /* ANIMATION INTERACTIVE : Transformation des trois traits en une croix (✕) */
+    .menu-toggle.toggle-active .bar:nth-child(1) {
+        transform: translateY(9px) rotate(45deg);
+        background-color: var(--orange-action);
+    }
+    .menu-toggle.toggle-active .bar:nth-child(2) {
+        opacity: 0; /* Le trait du milieu disparaît */
+    }
+    .menu-toggle.toggle-active .bar:nth-child(3) {
+        transform: translateY(-9px) rotate(-45deg);
+        background-color: var(--orange-action);
+    }
+}
+
+
+
+
+
+
+/* ==========================================================================
+   TITRES DE SECTIONS GÉNÉRAUX & RESPONSIVE
+   ========================================================================== */
+.section-title {
+    text-align: left; /* Aligné à gauche sur ordinateur pour le style asymétrique */
+    margin-bottom: 45px; /* Éloignement idéal pour laisser respirer le contenu */
+    padding: 0 15px; /* Évite les collisions de bordures sur iPhone 12 */
+    width: 100%;
+}
+
+.section-title h2 {
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: var(--vert-primary);
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    margin-bottom: 10px;
+}
+
+.section-title p {
+    font-size: 1.1rem;
+    color: #4B5563;
+    line-height: 1.5;
+}
+
+/* ==========================================================================
+   2. RESOLUTION DE L'ERREUR W3C LIGNE 284 (GALERIE IMAGES)
+   ========================================================================== */
+.gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    object-position: center; 
+    transition: var(--transition-smooth);
+}
+
+/* ==========================================================================
+   3. BANNIÈRE PRINCIPALE ADAPTATIVE (Hero Section Grid)
+   ========================================================================== */
+/* ==========================================================================
+   CORRECTION FINALE : RETOUR ET ANIMATION DE L'IMAGE AU PREMIER PLAN
+   ========================================================================== */
+.monheaderImage {
+    position: relative; 
+    height: 100vh;
+    min-height: 100vh;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr; 
+    align-items: center;
+    padding: 120px 8% 60px 8%; 
+    gap: 40px;
+    box-sizing: border-box;
+    overflow: hidden; /* Coupe l'image pour qu'elle ne dépasse pas des bords */
+    
+    /* CORRECTION 1 : On force le fond de la section à être transparent 
+       pour que l'image cachée derrière devienne visible */
+    background-color: transparent !important; 
+}
+
+/* LE CONTENEUR DE L'IMAGE ANIMÉE */
+.monheaderImage::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    
+    /* CORRECTION 2 : On change le z-index de -1 à -2 pour être sûr 
+       que l'image reste tout au fond mais visible sous les textes */
+    z-index: -2; 
+    
+    /* VÉRIFICATION DU CHEMIN : Assurez-vous que le nom de l'image est le bon (ex: photo.jpg ou imageF.png) */
+    background-image: linear-gradient(to right, rgba(10, 15, 12, 0.85) 35%, rgba(10, 15, 12, 0.2) 100%), 
+                      url('image/photo.jpg');
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    
+    /* Lancement de l'animation de zoom et de glissement */
+    animation: zoomCinématique 14s ease-in-out infinite alternate !important;
+    will-change: transform; 
+}
+
+/* LE MOUVEMENT DE ZOOM ET GLISSEMENT DE L'IMAGE */
+@keyframes zoomCinématique {
+    0% {
+        transform: scale(1) translate(0, 0);
+    }
+    100% {
+        transform: scale(1.15) translate(8px, -5px); /* Zoome de 15% et se décale légèrement */
+    }
+}
+
+/* PROTECTION POUR LE TEXTE S'IL Y A UN SOUCI D'IMAGE */
+.monheaderImage h1, 
+.monheaderImage p {
+    position: relative;
+    z-index: 2; /* Force les textes à rester bien au-dessus de l'image en mouvement */
+}
+
+/* ADAPTATION SMARTPHONE (IPHONE 12) */
+@media (max-width: 968px) {
+    .monheaderImage {
+        grid-template-columns: 1fr;
+        text-align: center;
+        padding: 140px 24px 60px 24px;
+    }
+}
+
+/* 3. LE GRAND TITRE RECALIBRÉ */
+.monheaderImage h1 {
+    font-size: clamp(2.2rem, 4.5vw, 3.8rem); /* Fluidité totale selon la taille de votre écran PC */
+    color: #FFFFFF; /* Blanc pur et éclatant */
+    line-height: 1.2;
+    margin-bottom: 25px;
+    font-weight: 800; /* Épaisseur institutionnelle maximale */
+    max-width: 100%;
+    letter-spacing: -1px;
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+}
+
+/* CORRECTION DE COULEUR AGRO-PASTORALE : Vert Menthe Lumineux Haute Lisibilité */
+.highlight-agro {
+    color: #00E676; /* Vert éclatant qui tranche magnifiquement sur le fond sombre texturé */
+    font-weight: 800;
+    text-shadow: 0 4px 20px rgba(0, 230, 118, 0.2); /* Légère lueur pour un aspect moderne */
+}
+
+/* 4. LE PARAGRAPHE DE DESCRIPTION */
+.monheaderImage p {
+    font-size: clamp(1rem, 1.15vw, 1.2rem); 
+    color: #E5E7EB; /* Blanc cassé soyeux */
+    margin-bottom: 40px;
+    line-height: 1.65;
+    max-width: 680px;
+    font-weight: 400;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+/* BOUTON D'APPEL À L'ACTION (CTA) */
+.btn-cta {
+    display: inline-block;
+    padding: 16px 36px;
+    background-color: var(--orange-action);
+    color: var(--white);
+    text-decoration: none;
+    font-weight: 700;
+    border-radius: var(--radius-smooth);
+    box-shadow: 0 10px 25px rgba(217, 119, 6, 0.4);
+    transition: var(--transition-smooth);
+    text-transform: uppercase;
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+}
+
+.btn-cta:hover {
+    transform: translateY(-4px);
+    background-color: #B45309; 
+    box-shadow: 0 15px 30px rgba(217, 119, 6, 0.5);
+}
+
+/* ==========================================================================
+   5. SECTION 1 : NOS DOMAINES D'EXPERTISE RESPONSIVE
+   ========================================================================== */
+.expertises-section {
+    padding: 80px 8% 50px 8%;
+    width: 100%;
+}
+
+.expertises-grid {
+    display: grid;
+    /* Gère l'adaptation automatique des colonnes sans casser le design */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+    gap: 40px;
+}
+
+.expert-card {
+    background-color: var(--white);
+    padding: 40px;
+    border-radius: var(--radius-smooth);
+    border: 1px solid rgba(27, 67, 50, 0.04);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.01);
+    transition: var(--transition-smooth);
+}
+
+.expert-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 35px rgba(27, 67, 50, 0.06);
+}
+
+.expert-card h3 {
+    color: var(--vert-primary);
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    font-weight: bold;
+    font-style: italic;
+}
+
+.expert-card p {
+    color: #4B5563;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+    line-height: 1.6; 
+}
+
+.btn-secondary {
+    text-decoration: none;
+    color: var(--vert-light);
+    font-weight: 600; 
+    font-size: 0.95rem;
+    transition: var(--transition-smooth);
+    display: inline-block;
+}
+
+.btn-secondary:hover {
+    color: var(--orange-action);
+}
+
+/* ==========================================================================
+   MEDIA QUERIES : CODE CORRECTEUR POUR MOBILE & IPONHE 12 (< 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+    
+    /* 1. Recentrement et calibrage des titres sur smartphone */
+    .section-title {
+        text-align: center; 
+        margin-bottom: 35px;
+        padding: 0 10px;
+    }
+
+    .section-title h2 {
+        font-size: 1.8rem !important; 
+        line-height: 1.3;
+    }
+
+    .section-title p {
+        font-size: 0.95rem !important;
+    }
+
+    /* 2. Pivot de la bannière Hero : Passe sur 1 seule colonne verticale */
+    .monheaderImage {
+        grid-template-columns: 1fr; 
+        text-align: center;
+        padding: 120px 24px 60px 24px;
+        gap: 30px;
+    }
+
+    .monheaderImage h1 {
+        font-size: 2.1rem !important; /* Réduction pour iPhone 12 */
+        line-height: 1.3;
+        margin: 0 auto 15px auto;
+    }
+
+    .monheaderImage p {
+        font-size: 1rem !important;
+        margin: 0 auto 25px auto;
+    }
+
+    .btn-cta {
+        width: 100%; /* Le bouton prend toute la largeur sur mobile pour le pouce */
+        text-align: center;
+    }
+
+    /* 3. Réduction des marges d'expertises sur petit écran */
+    .expertises-section {
+        padding: 60px 24px 40px 24px;
+    }
+
+    .expert-card {
+        padding: 30px 20px; /* Moins de vide interne sur mobile */
+    }
+}
+
+/* ==========================================================================
+   6. SECTION 2 : GALERIE EN MINIATURE (Preuve Sociale)
+   ========================================================================== */
+/* ==========================================================================
+   6. SECTION 2 : GALERIE EN MINIATURE (PREUVE SOCIALE) RESPONSIVE
+   ========================================================================== */
+.galerie-section {
+    padding: 80px 8%;
+    background-color: #FFFDF9;
+    width: 100%;
+}
+
+.gallery-filters {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 35px;
+    flex-wrap: wrap; /* Permet aux boutons de s'enrouler proprement sur petit écran */
+}
+
+.btn-filter {
+    padding: 10px 24px;
+    border: 2px solid var(--vert-primary);
+    background: transparent;
+    color: var(--vert-primary);
+    font-weight: 600;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+/* ÉTAT ACTIF : Allume le filtre sélectionné en vert avec texte blanc */
+.btn-filter.active, 
+.btn-filter:hover {
+    background-color: var(--vert-primary);
+    color: var(--white);
+    box-shadow: 0 4px 12px rgba(27, 67, 50, 0.15);
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 30px;
+    margin-bottom: 50px;
+}
+
+.gallery-item {
+    position: relative;
+    border-radius: var(--radius-smooth);
+    overflow: hidden;
+    height: 250px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.03);
+    transition: var(--transition-smooth);
+}
+
+.gallery-item.hide {
+    display: none;
+}
+
+/* FUSION ET NETTOYAGE : Propriétés de l'image unifiées selon les normes W3C */
+.gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    object-position: center; 
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Effet d'agrandissement fluide de la photo au survol */
+.gallery-item:hover img {
+    transform: scale(1.08); 
+}
+
+/* L'overlay vert transparent masqué par défaut */
+.gallery-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(27, 67, 50, 0.85); /* Fond vert translucide de marque */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    text-align: center;
+    opacity: 0; /* Invisible au repos */
+    transition: opacity 0.3s ease-in-out; 
+}
+
+/* Fait apparaître le voile vert au survol de la carte */
+.gallery-item:hover .gallery-overlay {
+    opacity: 1;
+}
+
+/* Style du texte à l'intérieur du voile vert */
+.gallery-overlay span {
+    color: var(--bg-creme);
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+/* ==========================================================================
+   7. SECTION 3 : POURQUOI NOUS CHOISIR ? RESPONSIVE
+   ========================================================================== */
+.why-us-section {
+    padding: 80px 8%;
+    width: 100%;
+}
+
+.why-us-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+/* Cartes d'arguments avec la ligne orange à gauche (Règle des 10%) */
+.why-card {
+    background: var(--white);
+    padding: 30px;
+    border-radius: var(--radius-smooth);
+    border-left: 5px solid var(--orange-action);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.01);
+    transition: var(--transition-smooth);
+}
+
+/* Effet de soulèvement discret au survol de la carte d'argument */
+.why-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(27, 67, 50, 0.06);
+}
+
+.why-card h4 {
+    color: var(--vert-primary);
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+    font-weight: 700;
+}
+
+.why-card p {
+    color: #555555;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+/* ==========================================================================
+   MEDIA QUERIES : CORRECTIONS TEXTURES POUR TÉLÉPHONES (< 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+    /* Ajustement des espaces de la galerie sur mobile */
+    .galerie-section {
+        padding: 60px 24px 40px 24px;
+    }
+    
+    .gallery-filters {
+        gap: 10px; /* Resserre les boutons pour qu'ils tiennent sur deux lignes propres */
+        margin-bottom: 25px;
+    }
+
+    .btn-filter {
+        padding: 8px 18px; /* Boutons légèrement plus compacts au doigt */
+        font-size: 0.9rem;
+    }
+
+    .gallery-grid {
+        gap: 20px; /* Réduit l'espace vide entre les photos sur mobile */
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); /* Optimise la largeur */
+    }
+
+    .gallery-item {
+        height: 220px; /* Légère réduction de hauteur pour équilibrer l'écran mobile */
+    }
+
+    /* Ajustement de la section Pourquoi nous choisir */
+    .why-us-section {
+        padding: 60px 24px;
+    }
+
+    .why-us-grid {
+        gap: 20px; /* Aligne les blocs verticalement de façon serrée et propre */
+    }
+
+    .why-card {
+        padding: 25px 20px;
+    }
+}
+
+
+/* ==========================================================================
+   REFONTE CARROUSEL : FOND NET ET LOGOS EN CARTES BLANCHES LUMINEUSES
+   ========================================================================== */
+
+/* ==========================================================================
+   8. MODULE PARTENAIRES STRATÉGIQUES HORIZONTAL ET RESPONSIVE UNIVERSEL
+   ========================================================================== */
+.partenaires-slider-section {
+    padding: 140px 8% 120px 8%; 
+    text-align: center;
+    border-top: 1px solid rgba(0, 0, 0, 0.02);
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+    
+    /* CORRECTION SYNTAXE W3C : Ajout du 100% manquant pour valider le dégradé sur iPhone/Safari */
+    background-image: linear-gradient(rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 100%), 
+                      url("image/imageF.png");
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+}
+
+.partenaires-slider-section h2 {
+    font-size: 2.6rem;
+    font-weight: 800;
+    color: var(--vert-primary);
+    text-shadow: 0 2px 4px rgba(255, 255, 255, 0.8); 
+    line-height: 1.2;
+}
+
+.slider-container {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    overflow: hidden; /* Verrouille et masque le débordement horizontal */
+    padding: 30px 0;
+    box-sizing: border-box;
+}
+
+.logos-track {
+    display: flex;
+    align-items: center;
+    gap: 40px; 
+    flex-wrap: nowrap;
+    width: max-content;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); 
+}
+
+/* LES CARTES BLANCHES CONTENEURS */
+.logo-slide {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 220px; 
+    height: 110px; 
+    background-color: #FFFFFF; 
+    border-radius: 12px; 
+    padding: 15px 25px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); 
+    transition: var(--transition-smooth);
+    overflow: hidden !important; /* Coupe net tout élément qui tenterait de dépasser */
+    position: relative;
+    box-sizing: border-box;
+}
+
+.logo-slide:hover {
+    transform: translateY(-5px); 
+    box-shadow: 0 15px 35px rgba(27, 67, 50, 0.15); 
+    background-color: #FFFDF9; 
+}
+
+.logo-slide a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+/* CORRECTIF UNIVERSEL LOGOS : S'adapte à 100% de la carte sans déborder */
+.logo-slide img {
+    max-width: 100% !important; /* Contrainte stricte en largeur */
+    max-height: 100% !important; /* Contrainte stricte en hauteur */
+    width: auto !important;
+    height: auto !important;
+    object-fit: contain !important; /* Redimensionne proportionnellement sans distorsion */
+    filter: none !important; 
+    opacity: 0.95; 
+    transition: var(--transition-smooth);
+}
+
+.logo-slide img:hover {
+    opacity: 1;
+}
+
+/* PETITS BOUTONS INDICATEURS (DOTS) */
+.slider-dots {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 30px;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    background-color: rgba(0, 0, 0, 0.2); 
+    border-radius: 50%;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.dot.active {
+    background-color: var(--vert-primary); 
+    transform: scale(1.3);
+}
+
+/* ==========================================================================
+   CORRECTIONS DE SÉCURITÉ RESPONSIVE POUR TOUS LES TÉLÉPHONES
+   ========================================================================== */
+@media (max-width: 768px) {
+    .partenaires-slider-section {
+        /* CORRECTIF VISAGE : On réduit la marge haute pour remonter le titre 
+           et laisser votre visage parfaitement visible sur smartphone */
+        padding: 60px 15px 80px 15px !important; 
+        box-sizing: border-box !important;
+    }
+
+    .partenaires-slider-section h2 {
+        font-size: 1.8rem !important; /* Calibrage de taille pour éviter les coupures de mots */
+        line-height: 1.3;
+    }
+
+    .slider-container {
+        padding: 15px 0 !important;
+    }
+
+    /* Active le glissement fluide au doigt sur les écrans tactiles */
+    .logos-track {
+        gap: 20px !important;
+        overflow-x: auto !important; /* Permet le swipe tactile natif */
+        justify-content: flex-start !important;
+        width: 100% !important;
+        padding-bottom: 10px;
+    }
+
+    /* Ajustement de la taille des cartes pour les petits écrans de smartphones */
+    .logo-slide {
+        min-width: 160px !important;
+        width: 160px !important;
+        height: 85px !important;
+        padding: 10px 15px !important;
+        border-radius: 8px !important;
+    }
+
+    /* Désactive l'effet de soulèvement vertical sur écran tactile pour éviter les saccades */
+    .logo-slide:hover {
+        transform: none !important;
+    }
+    
+    .slider-dots {
+        margin-top: 20px;
+    }
+}
+
+
+
+
+
+
+
+/* ==========================================================================
+   DESIGN ASYMÉTRIQUE DU FORMULAIRE DE PROJET HAUT DE GAMME
+   ========================================================================== */
+/* ==========================================================================
+   9. STRUCTURE ASYMÉTRIQUE DU FORMULAIRE DE PROJET (ORDINATEUR)
+   ========================================================================== */
+.contact-section {
+    padding: 140px 8% 80px 8%;
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr; /* Double colonne parfaite */
+    gap: 60px;
+    align-items: start;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.contact-intro-box {
+    position: sticky;
+    top: 140px;
+    text-align: left;
+}
+
+.contact-intro-box h2 {
+    font-size: 2.5rem;
+    color: var(--vert-primary);
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 20px;
+    word-break: break-word; /* Protection contre les coupures de mots */
+}
+
+.intro-lead {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--orange-action);
+    margin-bottom: 10px;
+}
+
+.contact-intro-box p {
+    font-size: 1.1rem;
+    color: #4B5563;
+    line-height: 1.6;
+}
+
+/* Bloc de saisie compact à droite */
+.contact-wrapper {
+    width: 100%;
+    max-width: 580px;
+    margin-left: auto;
+    background-color: var(--white);
+    padding: 40px 30px;
+    border-radius: var(--radius-smooth);
+    box-shadow: 0 15px 40px rgba(27, 67, 50, 0.04);
+    border: 1px solid rgba(27, 67, 50, 0.06);
+    box-sizing: border-box;
+}
+
+.form-section-title {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--vert-primary);
+    border-bottom: 2px solid rgba(27, 67, 50, 0.08);
+    padding-bottom: 8px;
+    margin: 35px 0 20px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-section-title:first-of-type { 
+    margin-top: 0; 
+}
+
+.form-block {
+    margin-bottom: 22px;
+    padding: 20px;
+    border-radius: 12px;
+    background-color: #FAFAFA;
+    border: 1px solid #F1F1F1;
+    transition: var(--transition-smooth);
+    box-sizing: border-box;
+}
+
+/* ÉTAT ALERTE ROSE JOTFORM REPRODUIT */
+.form-block.field-error {
+    background-color: #FFF5F5 !important;
+    border: 1px solid #E53E3E !important;
+    border-left: 5px solid #E53E3E !important;
+}
+
+.block-label {
+    display: block;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--vert-primary);
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+
+.required-star {
+    color: #E53E3E;
+    margin-left: 3px;
+    font-weight: bold;
+}
+
+.form-single-input input, 
+.form-single-input select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #D1D5DB;
+    background-color: var(--white);
+    border-radius: 8px;
+    font-size: 1rem;
+    color: var(--text-dark);
+    outline: none;
+    transition: var(--transition-smooth);
+    box-sizing: border-box;
+}
+
+.form-single-input input:focus, 
+.form-single-input select:focus {
+    border-color: var(--vert-light);
+    box-shadow: 0 0 0 4px rgba(64, 145, 108, 0.15);
+}
+
+.form-block.field-error input, 
+.form-block.field-error select {
+    border-color: #E53E3E !important;
+}
+
+.error-message {
+    display: none;
+    color: #E53E3E;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-top: 10px;
+    line-height: 1.4;
+}
+
+.form-block.field-error .error-message { 
+    display: block; 
+}
+
+.radio-checkbox-group { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 14px; 
+}
+
+.radio-checkbox-group.inline-options { 
+    display: flex;
+    flex-direction: row; 
+    gap: 25px; 
+}
+
+.option-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.98rem;
+    color: var(--text-dark);
+    cursor: pointer;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.option-label input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--vert-light);
+    cursor: pointer;
+    flex-shrink: 0; /* Empêche le bouton rond de se déformer si le texte prend plusieurs lignes */
+}
+
+.inline-text-input {
+    border: none !important;
+    border-bottom: 2px solid #D1D5DB !important;
+    border-radius: 0 !important;
+    padding: 2px 6px !important;
+    width: 200px !important;
+    font-size: 0.95rem !important;
+    background-color: transparent !important;
+    box-sizing: border-box;
+}
+
+.inline-text-input:focus {
+    border-bottom-color: var(--orange-action) !important;
+    box-shadow: none !important;
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 16px;
+    background-color: var(--vert-primary);
+    color: var(--white);
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(27, 67, 50, 0.15);
+    transition: var(--transition-smooth);
+    box-sizing: border-box;
+}
+
+.btn-submit:hover {
+    background-color: var(--orange-action);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(217, 119, 6, 0.3);
+}
+
+/* ==========================================================================
+   CORRECTIONS DE COMPATIBILITÉ UNIVERSELLE POUR TOUS LES TÉLÉPHONES
+   ========================================================================== */
+@media (max-width: 968px) {
+    .contact-section { 
+        grid-template-columns: 1fr; /* Bascule immédiate sur 1 seule colonne verticale */
+        gap: 40px; 
+        padding: 100px 24px 60px 24px !important; 
+    }
+    
+    .contact-intro-box { 
+        position: static; 
+        text-align: center; 
+        width: 100%;
+    }
+    
+    .contact-intro-box h2 { 
+        font-size: 2rem !important; 
+    }
+    
+    .contact-wrapper { 
+        margin: 0 auto; 
+        padding: 30px 20px; 
+        max-width: 100%;
+    }
+    
+    /* Force les options alignées à plat (Radios/Checkboxes) à se ranger verticalement sur mobile */
+    .radio-checkbox-group.inline-options { 
+        flex-direction: column !important; 
+        gap: 14px !important; 
+    }
+    
+    /* CORRECTIF DE SÉCURITÉ IPHONE : Force la taille à 16px pour interdire le zoom forcé d'iOS */
+    .form-single-input input, 
+    .form-single-input select,
+    .inline-text-input {
+        font-size: 16px !important; 
+    }
+    
+    .inline-text-input { 
+        width: 100% !important; 
+        margin-top: 5px; 
+    }
+    
+    /* Empilement propre de la case à cocher "Autre" */
+    #proj-autre-option { 
+        flex-direction: column; 
+        align-items: flex-start; 
+        gap: 8px; 
+    }
+    
+    .form-block {
+        padding: 15px;
+    }
+}
+
+
+/* ==========================================================================
+   DESIGN COMPATIBLE ET RESPONSIVE DU FOOTER (PIED DE PAGE)
+   ========================================================================== */
+/* ==========================================================================
+   7. PIED DE PAGE PROFESSIONNEL ET ADAPTATIF (MAIN FOOTER)
+   ========================================================================== */
+.main-footer {
+    background-color: #0B1E14; /* Vert ultra-profond pour un rendu haut de gamme */
+    color: #E5E7EB; /* Texte en blanc cassé très lisible */
+    padding: 80px 8% 20px 8%;
+    border-top: 3px solid var(--orange-action); /* Ligne orange de rappel de marque (10%) */
+    width: 100%;
+    box-sizing: border-box; /* Sécurité contre le débordement horizontal */
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr 1fr 1fr; /* Structure équilibrée en 4 colonnes sur PC */
+    gap: 50px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 50px;
+    box-sizing: border-box;
+}
+
+.footer-column {
+    box-sizing: border-box;
+}
+
+/* Style dédié à l'intégration de l'image de votre logo */
+.logo-footer {
+    margin-bottom: 20px;
+}
+
+.logo-footer img {
+    height: 50px;
+    width: auto;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.footer-column h3 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--white);
+    margin-bottom: 20px;
+    letter-spacing: -0.5px;
+}
+
+.footer-column h4 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 25px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.footer-column p {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: #9CA3AF; /* Gris atténué pour le paragraphe d'introduction */
+}
+
+/* Listes de liens du footer */
+.footer-links, 
+.footer-contact-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.footer-links li,
+.footer-contact-list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.footer-links a, 
+.footer-contact-list a {
+    color: #9CA3AF;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: var(--transition-smooth);
+    display: inline-block;
+}
+
+.footer-links a:hover, 
+.footer-contact-list a:hover {
+    color: var(--orange-action); /* S'allume en orange au survol */
+    transform: translateX(4px); /* Petit décalage dynamique fluide sur PC */
+}
+
+.footer-contact-list span {
+    color: #9CA3AF;
+    font-size: 0.95rem;
+}
+
+/* Zone réseaux sociaux */
+.footer-socials {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.social-link {
+    color: #9CA3AF;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: var(--transition-smooth);
+    display: inline-block;
+}
+
+.social-link:hover {
+    color: var(--white);
+}
+
+.whatsapp-footer {
+    color: #25D366 !important; /* Force la couleur verte officielle WhatsApp */
+    font-weight: 700;
+}
+
+.whatsapp-footer:hover {
+    text-shadow: 0 0 10px rgba(37, 211, 102, 0.4);
+}
+
+/* Barre de Copyright inférieure */
+.footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 25px;
+    font-size: 0.85rem;
+    color: #6B7280;
+}
+
+.dev-credit {
+    font-style: italic;
+}
+
+/* ==========================================================================
+   ADAPTATION PROGRESSIVE POUR TABLETTES (ÉCRANS MOYENS < 968px)
+   ========================================================================== */
+@media (max-width: 968px) {
+    .footer-grid {
+        grid-template-columns: 1fr 1fr; /* Passe proprement à 2 colonnes sur tablette */
+        gap: 40px;
+    }
+}
+
+/* ==========================================================================
+   ADAPTATION STRICTE POUR TOUS LES TÉLÉPHONES PORTABLES (< 640px)
+   ========================================================================== */
+@media (max-width: 640px) {
+    .main-footer {
+        padding: 60px 24px 20px 24px !important; /* Plus d'espace interne sur l'écran du smartphone */
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr !important; /* Empilement vertical complet et stable */
+        gap: 40px;
+        text-align: center; /* Recentre l'intégralité des textes sur smartphone */
+    }
+
+    .footer-column h4 {
+        margin-bottom: 15px;
+    }
+
+    /* Recentrement horizontal de toutes les listes de liens et icônes sur mobile */
+    .footer-links, 
+    .footer-contact-list {
+        align-items: center;
+    }
+
+    .footer-links li,
+    .footer-contact-list li {
+        justify-content: center;
+    }
+
+    /* Désactive l'effet de décalage horizontal au survol sur mobile pour éviter les bugs tactiles */
+    .footer-links a:hover, 
+    .footer-contact-list a:hover {
+        transform: none !important;
+    }
+
+    /* Alignement vertical strict de la barre de copyright sur smartphone */
+    .footer-bottom {
+        flex-direction: column !important; 
+        gap: 12px;
+        text-align: center;
+    }
+}
+
+
+
+
+
+
+/* ==========================================================================
+   ANIMATIONS D'APPARITION PROGRESSIVE POUR TOUT LE CONTENU (GLOBAL)
+   ========================================================================== */
+
+.js-reveal {
+    opacity: 0;
+    transform: translateY(50px); /* Poussé vers le bas de 50px */
+    transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1), 
+                transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: opacity, transform; /* Optimisation pour iPhone 12 / Écrans fluides */
+}
+
+/* L'état allumé et visible dès que la section entre dans l'écran */
+.js-reveal.reveal-active {
+    opacity: 1;
+    transform: translateY(0); /* Reprend sa place normale */
+}
+
+
+
+
+
+
+
+
+/* ==========================================================================
+   BOUTON DE RETOUR EN HAUT (BACK TO TOP URA-PRO)
+   ========================================================================== */
+.back-to-top-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px; /* Aligné sur le côté droit de l'ordinateur et de l'iPhone */
+    width: 50px;
+    height: 50px;
+    background-color: var(--orange-action); /* Votre orange officiel */
+    color: var(--white); /* Flèche blanche */
+    border: none;
+    border-radius: 50%; /* Forme un cercle parfait */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 1500; /* Reste au-dessus de toutes vos sections */
+    box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3);
+    
+    /* ÉTAT INITIAL : Complètement masqué et transparent tout en haut du site */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.arrow-up {
+    font-size: 1.4rem;
+    font-weight: 800;
+    transition: transform 0.3s ease;
+}
+
+/* EFFET INTERACTIF AU SURVOL */
+.back-to-top-btn:hover {
+    background-color: #B45309; /* Un orange un peu plus soutenu */
+    transform: translateY(-5px); /* Le bouton se soulève de 5px */
+    box-shadow: 0 8px 20px rgba(217, 119, 6, 0.5);
+}
+
+.back-to-top-btn:hover .arrow-up {
+    transform: translateY(-3px); /* La petite flèche blanche monte légèrement */
+}
+
+/* CLASSE DYNAMIQUE INJECTÉE PAR LE JS : Rend le bouton visible au défilement */
+.back-to-top-btn.show-btn {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* ADAPTATION SMARTPHONE (IPHONE 12 / RESPONSIVE) */
+@media (max-width: 768px) {
+    .back-to-top-btn {
+        bottom: 20px;
+        right: 20px; /* Plus serré sur les bords pour les téléphones */
+        width: 44px;
+        height: 44px; /* Un tout petit peu plus compact sur mobile */
+    }
+    
+    .arrow-up {
+        font-size: 1.2rem;
+    }
+    
+    /* Désactive l'effet de soulèvement au survol pour éviter les bugs tactiles */
+    .back-to-top-btn:hover {
+        transform: none !important;
+    }
+}
+
+
+
+
+/* ==========================================================================
+   BOUTON DE RETOUR EN HAUT (APPARITION À L'ARRÊT DU SCROLL)
+   ========================================================================== */
+.back-to-top-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px; 
+    width: 50px;
+    height: 50px;
+    background-color: var(--orange-action); /* Votre orange officiel */
+    color: var(--white); 
+    border: none;
+    border-radius: 50%; /* Cercle parfait comme sur votre image */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 1500; 
+    box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3);
+    
+    /* ÉTAT INITIAL : Caché par défaut */
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.8);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+}
+
+.arrow-up {
+    font-size: 1.4rem;
+    font-weight: 800;
+}
+
+/* CLASSE INJECTÉE PAR LE JS : Le bouton apparaît dès que le scroll s'arrête */
+.back-to-top-btn.show-btn {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+}
+
+.back-to-top-btn:hover {
+    background-color: #B45309;
+    transform: scale(1.05);
+}
+
+/* RESPONSIVE TOUS TÉLÉPHONES (IPHONE 12) */
+@media (max-width: 768px) {
+    .back-to-top-btn {
+        bottom: 20px;
+        right: 20px; 
+        width: 46px;
+        height: 46px; 
+    }
+}
+
+
+
+
+
+
+
+    </style>
+
+
+<body>  
+
+
+
+<header id="mainHeader">
+        
+<div class="logo">
+    <a href="">
+        <img src="image/logo.png" alt="mon logo">
+    </a>
+</div>
+    <button class="menu-toggle" id="menuToggle" aria-label="Ouvrir le menu">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+    </button>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="#accueil" class="active">Accueil</a></li>
+                <li><a href="#expertises">Expertises Agro-pastoral</a></li>
+                <li><a href="#galerie">Projets</a></li>
+                <li><a href="#Partenaires">Nos partenaires</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+        <!-- BOUTON DE RETOUR EN HAUT (BACK TO TOP) -->
+
+
+    </header>
+
+    <section  class="monheaderImage">
+         <div class="hero-text">
+            <h1>MOAYE SERVICE | L'Expertise au service de vos projets <span style="color: var(--orange-action);">Agro-pastoraux</span> et <span style="color: var(--orange-action);">BTP</span>.</h1>
+
+            <p>De la conception de vos infrastructures agricoles à la réalisation de vos travaux publics, nous garantissons des résultats durables et professionnels.</p>
+            <a href="#contact" class="btn-cta">Demandez votre devis gratuit</a>
+       </div>
+       
+
+    </section>
+<main>
+     <section id="expertises" class="expertises-section">
+            <div class="section-title">
+                <h2>Nos Domaines d'Expertise</h2>
+                <p>Une double compétence unique pour répondre à vos besoins stratégiques.</p>
+            </div>
+            
+            <div class="expertises-grid">
+                <!-- Volet Agro-pastoral -->
+                <div class="expert-card">
+                    <h3>Volet Études et Conception</h3>
+                    <p>Rédaction de plans d'affaires (Business plans), études de marché et mise en œuvre globale de projets agro-industriels</p>
+                    <a href="#contact" class="btn-secondary">En savoir plus</a>
+                </div>
+                <div class="expert-card" id="btp">
+                    <h3>Volet Technique et Production</h3>
+                    <p>Développement de fermes (notamment aquacoles et piscicoles), construction d'ouvrages hydro-agricoles et formulation d'aliments pour le bétail.</p>
+                    <a href="#contact" class="btn-secondary">En savoir plus</a>
+                </div>
+                <div class="expert-card" >
+                    <h3>Volet Formation et Conseil</h3>
+                    <p> Encadrement et formation pratique des acteurs locaux (pisciculteurs, éleveurs, coopératives villageoises) aux bonnes pratiques de gestion.</p>
+                    <a href="#contact" class="btn-secondary">En savoir plus</a>
+                </div>
+            </div>
+        </section>
+            <section id="galerie" class="galerie-section">
+            <div class="section-title">
+                <h2>Nos Plus Belles Réalisations</h2>
+                <p>Découvrez notre savoir-faire validé sur le terrain.</p>
+            </div>
+            <!-- Boutons de filtrage dynamique gérés par le JavaScript -->
+           
+            <!-- Grille d'images de réalisations -->
+            <div class="gallery-grid">
+                <!-- Projet 1 : Apiculture -->
+                <div class="gallery-item" data-category="agro">
+                    <img src="image/apiculturre.jpg" alt="Apiculture moderne">
+                    <div class="gallery-overlay"><span>Apiculture / Installations rurale</span></div>
+                </div>
+                <!-- Projet 2 : Bâtiment Scolaire -->
+                <div class="gallery-item" data-category="btp">
+                    <img src="image/leau.jpg" alt="Construction de classe">
+                    <div class="gallery-overlay"><span>Construction de Salles de classe</span></div>
+                </div>
+                <!-- Projet 3 : Pisciculture -->
+                <div class="gallery-item" data-category="agro">
+                    <img src="image/imagesPoison.jpg" alt="Bassin de pisciculture">
+                    <div class="gallery-overlay"><span>Bassins de Pisciculture Modernes</span></div>
+                </div>
+                <!-- Projet 4 : Génie Civil -->
+                <div class="gallery-item" data-category="btp">
+                    <img src="image/projet1.jpg" alt="Génie Civil">
+                    <div class="gallery-overlay"><span>Travaux Publics & Génie Civil</span></div>
+                </div>
+                <div class="gallery-item" data-category="btp">
+                    <img src="image/Pindad.jpg" alt="pintad">
+                    <div class="gallery-overlay"><span>Travaux Publics & Génie Civil</span></div>
+                </div>
+                <div class="gallery-item" data-category="btp">
+                    <img src="image/oeuf.jpg" alt="oeuf">
+                    <div class="gallery-overlay"><span>Travaux Publics & Génie Civil</span></div>
+                </div>
+            </div>
+            <div class="center-btn">
+                <a href="#galerie" class="btn-cta">Voir toutes nos réalisations</a>
+            </div>
+        </section>
+         <section class="why-us-section">
+    <div class="section-title">
+        <h2>Pourquoi choisir ?</h2>
+        <p>Nous transformons vos investissements en exploitations rentables, durables et totalement autonomes.</p>
+    </div>
+    <div class="why-us-grid">
+        <!-- Argument 1 -->
+        <div class="why-card">
+            <h3>Synergie et rentabilité maximale</h3>
+            <p>Nous concevons vos fermes pour qu'aucun déchet ne soit perdu. Nous recyclons les déjections de vos élevages pour fertiliser vos cultures maraîchères, et réutilisons vos résidus agricoles pour nourrir vos poissons et votre bétail. Vous réduisez vos dépenses et multipliez vos gains.</p>
+        </div>
+        <!-- Argument 2 -->
+        <div class="why-card">
+            <h4>Garantie de votre sécurité alimentaire</h4>
+            <p>Nous construisons à vos côtés des modèles d'exploitations modernes visant l'autosuffisance totale en viandes, poissons et produits maraîchers. En choisissant nos infrastructures, vous sécurisez vos sources d'approvisionnement et répondez avec succès à la demande locale.</p>
+        </div>
+        <!-- Argument 3 -->
+        <div class="why-card">
+            <h4>Indépendance totale en provenderie</h4>
+            <p>Ne subissez plus la flambée des prix des aliments importés ! Nous intégrons à vos projets des unités de production locale d'aliments pour bétail grâce à nos extrudeuses haute performance. Vous fabriquez votre propre provende et reprenez le contrôle de vos coûts de production.</p>
+        </div>
+    </div>
+</section>
+<section id="partenaires" class="partenaires-slider-section">
+    <div class="section-title-center">
+        <h2>Nos Partenaires Stratégiques</h2>
+        <div class="decor-leaf">🍃</div>
+    </div>
+    
+    <!-- Conteneur principal du slider -->
+    <div class="slider-container" id="sliderContainer">
+        <div class="logos-track" id="logosTrack">
+            <!-- Logo 1 : FEM -->
+            <div class="logo-slide">
+                <a href="https://afdb.org" target="_blank">
+                    <img src="imagePatenaires/GEF_logo.png" alt="FEM - Fonds pour l'Environnement Mondial">
+                </a>
+            </div>
+            
+            <!-- Logo 2 : ONG Agropole -->
+            <div class="logo-slide">
+               <a href="https://pdc2v.ci/agroples/" target="_blank">
+                   <img src="imagePatenaires/Agropole.png" alt="ONG Agropole Toumodi">
+                </a>
+            </div>
+            
+            <!-- Logo 3 : Experts Locaux -->
+            <div class="logo-slide">
+                <a href="https://www.csrs.ch/fr">
+                    <img src="imagePatenaires/CRSS.png" alt="Centre Suisse de Recherches Scientifiques en Côte d’Ivoire (CSRS)"> 
+                </a>
+                
+            </div>
+            
+            <!-- Logo 4 : CORAF -->
+            <div class="logo-slide">
+               <a href="https://experts.coraf.org/">
+                 <img src="imagePatenaires/logoCORAF.png" alt="CORAF">
+               </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Les petits boutons de navigation (Allumés et cliquables) -->
+    <div class="slider-dots" id="dotsContainer">
+        <span class="dot active" data-index="0"></span>
+        <span class="dot" data-index="1"></span>
+        <span class="dot" data-index="2"></span>
+        <span class="dot" data-index="3"></span>
+    </div>
+</section>
+
+
+<section id="demande-projet" class="contact-section">
+    <!-- CÔTÉ GAUCHE : Textes d'introduction fixés -->
+    <div class="contact-intro-box">
+        <h2>Formulaire de Demande de Projet</h2>
+        <p class="intro-lead">Merci de l'intérêt porté à MOAYE SERVICE.</p>
+        <p>Veuillez remplir ce formulaire pour nous aider à mieux comprendre votre projet agro-pastoral et vous proposer une solution sur-mesure adaptée à vos ambitions.</p>
+    </div>
+    
+    <!-- CÔTÉ DROIT : Le bloc formulaire compact -->
+    <div class="contact-wrapper">
+        <form id="projectForm" class="quote-form" novalidate>
+            
+            <!-- PARTIE 1 : INFORMATIONS GÉNÉRALES -->
+            <div class="form-section-title">1. Informations Générales</div>
+            
+            <div class="form-block" id="block-proj-name">
+                <label class="block-label">Nom complet / Nom de l'entreprise <span class="required-star">*</span></label>
+                <div class="form-single-input">
+                    <input type="text" id="proj-name" placeholder="Ex: Jean Koffi / Société Coopérative">
+                </div>
+                <div class="error-message">⚠️ Ce champ est obligatoire.</div>
+            </div>
+
+            <div class="form-block" id="block-proj-city">
+                <label class="block-label">Ville / Région <span class="required-star">*</span></label>
+                <div class="form-single-input">
+                    <input type="text" id="proj-city" placeholder="Ex: Abidjan, Toumodi, Bouaké">
+                </div>
+                <div class="error-message">⚠️ Ce champ est obligatoire.</div>
+            </div>
+
+            <div class="form-block" id="block-proj-phone">
+                <label class="block-label">Téléphone (WhatsApp de préférence) <span class="required-star">*</span></label>
+                <div class="form-single-input">
+                    <input type="text" id="proj-phone" placeholder="Ex: 07 00 00 00 00">
+                </div>
+                <div class="error-message">⚠️ Ce champ est obligatoire.</div>
+            </div>
+
+            <div class="form-block" id="block-proj-email">
+                <label class="block-label">E-mail <span class="required-star">*</span></label>
+                <div class="form-single-input">
+                    <input type="email" id="proj-email" placeholder="exemple@domaine.com">
+                </div>
+                <div class="error-message">⚠️ Adresse e-mail invalide ou manquante.</div>
+            </div>
+
+            <!-- PARTIE 2 : SECTEUR D'INTÉRÊT -->
+            <div class="form-section-title">2. Votre Secteur d'Intérêt</div>
+            <div class="form-block" id="block-proj-sectors">
+                <label class="block-label">Cochez la case correspondante <span class="required-star">*</span></label>
+                <div class="radio-checkbox-group">
+                    <label class="option-label"><input type="checkbox" class="proj-sector-check" value="Pisciculture (Installation hors-sol, étude technique)"> Pisciculture : Installation hors-sol, étude de faisabilité technique.</label>
+                    <label class="option-label"><input type="checkbox" class="proj-sector-check" value="Aviculture (Pondeuses ou Poulets de chair)"> Aviculture : Élevage de pondeuses (production d'œufs) ou poulets de chair.</label>
+                    <label class="option-label"><input type="checkbox" class="proj-sector-check" value="Élevage bovin (Lait ou Engraissement)"> Élevage bovin : Production de lait ou engraissement de vaches laitières.</label>
+                    <label class="option-label"><input type="checkbox" class="proj-sector-check" value="Élevage porcin (Charcutiers et Budget)"> Élevage porcin : Production de porcs charcutiers et gestion budgétaire.</label>
+                    <label class="option-label" id="proj-autre-option">
+                        <input type="checkbox" class="proj-sector-check" value="Autre" id="sector-autre"> Autre : 
+                        <input type="text" id="proj-sector-autre-text" placeholder="Précisez votre élevage..." class="inline-text-input">
+                    </label>
+                </div>
+                <div class="error-message">⚠️ Veuillez sélectionner au moins un secteur d'intérêt.</div>
+            </div>
+
+            <!-- PARTIE 3 : DÉTAILS DU PROJET -->
+            <div class="form-section-title">3. Détails du Projet</div>
+            <div class="form-block" id="block-proj-service">
+                <label class="block-label">Type de service souhaité <span class="required-star">*</span></label>
+                <div class="radio-checkbox-group">
+                    <label class="option-label"><input type="radio" name="proj-service" value="Étude de faisabilité complète"> Étude de faisabilité complète</label>
+                    <label class="option-label"><input type="radio" name="proj-service" value="Analyse de rentabilité financière"> Analyse de rentabilité financière</label>
+                    <label class="option-label"><input type="radio" name="proj-service" value="Accompagnement technique / Coaching"> Accompagnement technique / Coaching</label>
+                    <label class="option-label"><input type="radio" name="proj-service" value="Installation d'infrastructures"> Installation d'infrastructures</label>
+                </div>
+                <div class="error-message">⚠️ Veuillez cocher le type de service souhaité.</div>
+            </div>
+
+            <div class="form-block" id="block-proj-size">
+                <label class="block-label">Quelle est la taille prévue de votre exploitation ? <span class="required-star">*</span></label>
+                <div class="form-single-input">
+                    <input type="text" id="proj-size" placeholder="Ex: 1000 pondeuses, 10 bacs hors-sol...">
+                </div>
+                <div class="error-message">⚠️ Ce champ est obligatoire.</div>
+            </div>
+
+            <div class="form-block" id="block-proj-hasLand">
+                <label class="block-label">Disposez-vous déjà d'un site/terrain ? <span class="required-star">*</span></label>
+                <div class="radio-checkbox-group inline-options">
+                    <label class="option-label"><input type="radio" name="proj-hasLand" value="Oui"> Oui</label>
+                    <label class="option-label"><input type="radio" name="proj-hasLand" value="Non"> Non</label>
+                </div>
+                <div class="error-message">⚠️ Veuillez répondre à cette question.</div>
+            </div>
+
+            <!-- PARTIE 4 : BUDGET ET DÉLAIS -->
+            <div class="form-section-title">4. Budget et Délais</div>
+            <div class="form-block" id="block-proj-budget">
+                <label class="block-label">Budget estimé pour l'investissement <span class="required-star">*</span></label>
+                <div class="form-single-input">
+                    <input type="text" id="proj-budget" placeholder="Ex: 5 000 000 FCFA, À définir...">
+                </div>
+                <div class="error-message">⚠️ Ce champ est obligatoire.</div>
+            </div>
+
+            <div class="form-block" id="block-proj-delay">
+                <label class="block-label">Quand souhaitez-vous démarrer le projet ? <span class="required-star">*</span></label>
+                <div class="radio-checkbox-group">
+                    <label class="option-label"><input type="radio" name="proj-delay" value="Immédiatement"> Immédiatement</label>
+                    <label class="option-label"><input type="radio" name="proj-delay" value="D'ici 3 à 6 mois"> D'ici 3 à 6 mois</label>
+                    <label class="option-label"><input type="radio" name="proj-delay" value="Étude préliminaire uniquement"> Étude préliminaire uniquement</label>
+                </div>
+                <div class="error-message">⚠️ Veuillez sélectionner un délai de démarrage.</div>
+            </div>
+
+            <button type="submit" class="btn-submit">Soumettre </button>
+        </form>
+    </div>
+</section>
+
+
+
+
+
+
+<!-- ==========================================================================
+   7. PIED DE PAGE PREMIUM & MODERNE (Footer)
+   ========================================================================== -->
+<!-- ==========================================================================
+   7. PIED DE PAGE PROFESSIONNEL (Footer)
+   ========================================================================== */ -->
+<footer class="main-footer">
+    <div class="footer-grid">
+        
+        <!-- Colonne 1 : À Propos de l'entreprise -->
+        <div class="footer-column footer-brand">
+            <h3>MOAYE <span class="accent-text">SERVICE</span></h3>
+            <p>Votre partenaire stratégique en Côte d'Ivoire. Nous mettons notre double compétence unique au service de la réussite de vos projets Agro-pastoraux et BTP.</p>
+        </div>
+
+        <!-- Colonne 2 : Liens de navigation rapide -->
+        <div class="footer-column">
+            <h4>Navigation</h4>
+            <ul class="footer-links">
+                <li><a href="#accueil">Accueil</a></li>
+                <li><a href="#expertises">Nos Expertises</a></li>
+                <li><a href="#partenaires">Partenaires</a></li>
+                <li><a href="#galerie">Galerie Projets</a></li>
+                <li><a href="#demande-projet">Demander un devis</a></li>
+            </ul>
+        </div>
+
+        <!-- Colonne 3 : Informations de contact direct cliquables -->
+        <div class="footer-column">
+            <h4>Nos Coordonnées</h4>
+            <ul class="footer-contact-list">
+                <li>📍 <span>Abidjan, Commune d'Abobo</span></li>
+                <li>🕒 <span>Lun - Ven : 08h00 - 17h00</span></li>
+                <li>📞 <a href="tel:+2250000000000">+225 00 00 00 00 00</a></li>
+                <li>✉️ <a href="mailto:contact@moayeservice.com">contact@moayeservice.com</a></li>
+            </ul>
+        </div>
+
+        <!-- Colonne 4 : Réseaux sociaux & Action Directe -->
+        <div class="footer-column">
+            <h4>Suivez-nous</h4>
+            <div class="footer-socials">
+                <a href="#" class="social-link">Facebook</a>
+                <!-- Lien direct WhatsApp qui utilise votre variable globale -->
+                <a href="https://wa.me" target="_blank" class="social-link whatsapp-footer">WhatsApp En Ligne</a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Zone des mentions légales et copyright tout en bas -->
+    <div class="footer-bottom">
+        <p>&copy; 2026 MOAYE SERVICE - Tous droits réservés.</p>
+        <p class="dev-credit">Deveoloppe par N'goran Koffi Michael </p>
+
+
+        <button id="backToTop" class="back-to-top-btn" aria-label="Retourner en haut">
+    <span class="arrow-up">↑</span>
+       </button>
+
+       <!-- BOUTON INTELLIGENT DE RETOUR EN HAUT -->
+<button id="backToTop" class="back-to-top-btn" aria-label="Retourner en haut">
+    <span class="arrow-up">↑</span>
+</button>
+
+    </div>
+</footer>
+
+</main>
+
+    
+</body>
+
+<script>
+
+    // ==========================================================================
+// GESTION DU MENU DYNAMIQUE (DÉPASSEMENT DE L'IMAGE D'ACCUEIL)
+// ==========================================================================
+const mainHeader = document.getElementById('mainHeader');
+const heroSection = document.querySelector('.monheaderImage');
+
+if (mainHeader && heroSection) {
+    window.addEventListener('scroll', () => {
+        // On récupère la hauteur exacte en pixels de votre grande image d'accueil
+        const heroHeight = heroSection.offsetHeight;
+        
+        // Si le défilement dépasse la hauteur de l'image (moins la taille du menu)
+        if (window.scrollY >= (heroHeight - 500)) {
+            mainHeader.classList.add('scrolled'); // Le fond sombre apparaît
+        } else {
+            mainHeader.classList.remove('scrolled'); // Devient 100% transparent
+        }
+    });
+}
+
+// ==========================================================================
+// LOGIQUE DU MENU TOGGLE (TROIS TRAITS MOBILE)
+// ==========================================================================
+const menuToggle = document.getElementById('menuToggle');
+const navLinksContainer = document.getElementById('navLinks');
+const individualLinks = document.querySelectorAll('#navLinks a');
+
+if (menuToggle && navLinksContainer) {
+    // 1. Ouvrir ou fermer le volet lors du clic sur les trois traits
+    menuToggle.addEventListener('click', () => {
+        menuToggle.classList.toggle('toggle-active'); // Transforme les traits en croix
+        navLinksContainer.classList.toggle('open-menu'); // Fait glisser le menu vers le bas
+    });
+
+    // 2. Sécurité UX : Ferme automatiquement le menu quand le client clique sur un lien
+    individualLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            menuToggle.classList.remove('toggle-active');
+            navLinksContainer.classList.remove('open-menu');
+        });
+    });
+}
+
+
+
+// ==========================================================================
+// CONFIGURATION COMPLÈTE DU CARROUSEL INTERACTIF DE LOGOS (JS CORRIGÉ)
+// ==========================================================================
+const sliderContainer = document.getElementById('sliderContainer');
+const logosTrack = document.getElementById('logosTrack');
+const dots = document.querySelectorAll('#dotsContainer .dot');
+const slides = document.querySelectorAll('.logo-slide');
+
+let currentIndex = 0;
+let isPaused = false;
+let autoScrollTimer = null;
+
+// Fonction maîtresse pour déplacer la piste des logos
+function moveToSlide(index) {
+    // SÉCURITÉ : On vérifie que les éléments existent sur la page
+    if (!logosTrack || slides.length === 0 || !slides) return;
+    
+    currentIndex = index;
+    
+    // CORRECTION TECHNIQUE CRITIQUE : Ajout du [0] pour mesurer le premier logo
+    const slideWidth = slides[0].offsetWidth + 60; // 60 correspond au gap CSS
+    
+    // Application de la translation physique calculée en pixels
+    logosTrack.style.transform = `translateX(-${currentIndex * slideWidth}px)`;
+    
+    // Synchronisation de la couleur verte sur le petit bouton actif (dot)
+    dots.forEach(dot => dot.classList.remove('active'));
+    if (dots[currentIndex]) {
+        dots[currentIndex].classList.add('active');
+    }
+}
+
+// Fonction de défilement automatique pas à pas
+function startAutoScroll() {
+    if (autoScrollTimer) clearInterval(autoScrollTimer);
+    
+    autoScrollTimer = setInterval(() => {
+        if (!isPaused) {
+            let nextIndex = currentIndex + 1;
+            // Si on dépasse le 4ème logo, on revient en douceur au premier
+            if (nextIndex >= slides.length) {
+                nextIndex = 0;
+            }
+            moveToSlide(nextIndex);
+        }
+    }, 900); // Glissade automatique toutes les 3 secondes
+}
+
+// ---- INTERACTION 1 : MISE EN PAUSE IMMÉDIATE AU SURVOL ----
+if (sliderContainer) {
+    sliderContainer.addEventListener('mouseenter', () => {
+        isPaused = true;
+    });
+    
+    sliderContainer.addEventListener('mouseleave', () => {
+        isPaused = false;
+    });
+}
+
+// ---- INTERACTION 2 : CLIC PHYSIQUE SUR LES PETITS BOUTONS DOTS ----
+const dotsContainer = document.getElementById('dotsContainer');
+if (dotsContainer) {
+    dotsContainer.addEventListener('click', (e) => {
+        const targetDot = e.target.closest('.dot');
+        if (!targetDot) return; // Ignore le clic en dehors d'un point
+        
+        const index = parseInt(targetDot.getAttribute('data-index'));
+        moveToSlide(index);
+    });
+}
+
+// Lancement sécurisé une fois que les fichiers d'images sont chargés par le navigateur
+window.addEventListener('load', () => {
+    startAutoScroll();
+    moveToSlide(0); // Aligne le premier logo dès le départ
+});
+
+
+
+
+
+
+
+
+
+
+// ==========================================================================
+// OBSERVATEUR AUTOMATIQUE : APPARITION EN DESCENDANT, FIXE EN REMONTANT
+// ==========================================================================
+document.addEventListener('DOMContentLoaded', () => {
+    const sectionsToAnimate = document.querySelectorAll('main > section, .expertises-grid > div, .partenaires-container > div, .contact-wrapper');
+    
+    let lastScrollTop = 0;
+
+    // Ajout automatique de la classe de préparation invisible au démarrage
+    sectionsToAnimate.forEach(element => {
+        element.classList.add('js-reveal');
+    });
+
+    const globalObserverOptions = {
+        root: null,
+        rootMargin: '-30px',
+        threshold: 0.1
+    };
+
+    const globalRevealObserver = new IntersectionObserver((entries) => {
+        // Détection instantanée du sens du défilement (Haut ou Bas)
+        let currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+        let isMovingDown = currentScroll > lastScrollTop;
+        lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
+
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                // Si on descend, la section apparaît progressivement
+                entry.target.classList.add('reveal-active');
+            } else {
+                // CORRECTION : On masque UNIQUEMENT si l'utilisateur est en train de remonter
+                // et que l'élément sort par le bas de l'écran (prêt à être ré-affiché plus tard)
+                if (!isMovingDown && entry.boundingClientRect.top > 0) {
+                    entry.target.classList.remove('reveal-active');
+                }
+            }
+        });
+    }, globalObserverOptions);
+
+    sectionsToAnimate.forEach(element => {
+        globalRevealObserver.observe(element);
+    });
+});
+
+
+
+
+
+
+
+
+// ==========================================================================
+// LOGIQUE DU BOUTON COMPACT : APPARITION MAÎTRISÉE À L'ARRÊT DU DÉFILEMENT
+// ==========================================================================
+const backToTopBtn = document.getElementById('backToTop');
+let isScrollingTimer = null;
+
+if (backToTopBtn) {
+    window.addEventListener('scroll', () => {
+        // 1. PENDANT LE MOUVEMENT : On cache immédiatement le bouton
+        backToTopBtn.classList.remove('show-btn');
+
+        // Nettoie le minuteur précédent tant que l'utilisateur continue de défiler
+        clearTimeout(isScrollingTimer);
+
+        // 2. À L'ARRÊT DU MOUVEMENT : On lance un calcul après 400ms de pause
+        isScrollingTimer = setTimeout(() => {
+            // Sécurité : On affiche le bouton uniquement si on a quitté le haut du site (bannière)
+            if (window.scrollY > 400) {
+                backToTopBtn.classList.add('show-btn'); // Le bouton orange surgit
+            }
+        }, 400); // 400 millisecondes d'immobilité requises
+    }, { passive: true });
+
+    // 3. CLIC INTERACTIF : Retour au menu avec glissade fluide
+    backToTopBtn.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+}
+
+
+
+
+
+
+</script>
+
+
+
+
+
+
+</html>
